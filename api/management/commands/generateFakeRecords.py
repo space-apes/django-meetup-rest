@@ -1,9 +1,9 @@
 #populate DB with some test data. adds Users, MeetupGroups, Events and records to capture relationships between them.
 
-#can run this in django context by running django shell and importing. call 'generateAll()'
+from django.core.management.base import BaseCommand, CommandError
 import datetime
 from django.utils import timezone
-from .models import User, Tag, Event, MeetupGroup
+from api.models import User, Tag, Event, MeetupGroup
 from random import randint
 
 
@@ -79,7 +79,6 @@ def generateFakeUsers():
 
 		curCharCode+=1
 	
-	User.objects.get(pk=1).is_superuser = 1 
 
 def generateFakeTags():
 	tagNameList = ['singles', 'dating', 'archery', 'social', 'target practice', 'arrows', 'romance', 'machine learning', 'fletching', 'robin', 'hood', 'corporate', 'employed', 'neural networks', 'classifiers', 'regression', 'prediction', 'big data']
@@ -256,16 +255,16 @@ def generateFakeEvents():
 		e.save()
 		
 		#make sure to add host to participants list
-		print(f"len of member list before removing admin: {len(member_list)}")
+		#print(f"len of member list before removing admin: {len(member_list)}")
 		e.participants.add(m.admin)
 		member_list = member_list.exclude(id=m.admin.id)
 		
 		#remove one random person from meetup group and add rest as participants
-		print(f"len of member list after removing admin: {len(member_list)}")
+		#print(f"len of member list after removing admin: {len(member_list)}")
 		random_index = randint(0, len(member_list)-1)
-		print(f"random index from member_list is: {random_index}")
+		#print(f"random index from member_list is: {random_index}")
 		random_member = member_list.all()[random_index]
-		print(f"random member is: {random_member}")
+		#print(f"random member is: {random_member}")
 		member_list = member_list.exclude(id=random_member.id)
 
 		for member in member_list:
@@ -274,14 +273,17 @@ def generateFakeEvents():
 		e.save()
 
 
+class Command(BaseCommand):
+	help='run all functions to populate db with fake test cases for User, MeetupGroup, Tag, and Event models.'
 
-def generateAll():
-	generateFakeUsers()
-	superuser = User.objects.get(pk=1)
-	superuser.is_superuser = True
-	superuser.save()
+	def handle(self, *args, **options):
+		generateFakeUsers()
+		superuser = User.objects.get(pk=1)
+		superuser.is_superuser = True
+		superuser.save()
 
-	generateFakeTags()
-	generateFakeMeetupGroups()
-	generateFakeEvents()
+		generateFakeTags()
+		generateFakeMeetupGroups()
+		generateFakeEvents()
+		self.stdout.write(self.style.SUCCESS('successfully populated db. db explorer'))
 		
