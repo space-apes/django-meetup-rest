@@ -35,13 +35,14 @@ class Tag(models.Model):
 		return self.name
 
 class Event(models.Model):
-	name = models.CharField(max_length=25)
+	name = models.CharField(max_length=50)
 	description = models.CharField(max_length=200)
 	date = models.DateTimeField('date of event')
 	address = models.CharField(max_length = 100)
-	create_date = models.DateField('date created')
-	host = models.ForeignKey(User, on_delete=models.CASCADE)
+	date_created = models.DateField('date created')
+	host = models.ForeignKey(User, related_name='host_user', on_delete=models.CASCADE)
 	meetup_group = models.ForeignKey(MeetupGroup, on_delete=models.CASCADE)
+	participants = models.ManyToManyField(User)
 	
 	def __str__(self):
 		return self.name
