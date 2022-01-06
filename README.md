@@ -1,4 +1,7 @@
-#REST API for social meetup type web application
+# REST API for social meetup type web application
+- uses djangorestframework for REST API
+- uses JWT for authentication
+
 
 ### TO run:
 - install django

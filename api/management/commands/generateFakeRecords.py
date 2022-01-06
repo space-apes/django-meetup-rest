@@ -132,7 +132,7 @@ def generateFakeMeetupGroups():
 			       )
 		m.save()
 		for tagName in curGroup['tags_list']:
-			m.tag_set.add(Tag.objects.get(name=tagName))
+			m.tags.add(Tag.objects.get(name=tagName))
 		for member_id in curGroup['members_list']:
 			m.members.add(User.objects.get(pk=member_id))
 		m.save()

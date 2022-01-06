@@ -35,7 +35,7 @@ class MeetupGroup(models.Model):
 class Tag(models.Model):
 	name = models.CharField(max_length=25)
 	create_date = models.DateField('date created')
-	meetup_groups = models.ManyToManyField(MeetupGroup)
+	meetup_groups = models.ManyToManyField(MeetupGroup, related_name='tags')
 
 	def __str__(self):
 		return self.name
