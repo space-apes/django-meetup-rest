@@ -4,10 +4,16 @@ from rest_framework import serializers
 #to capture model relationships in api responses, need to describe relationships
 #in serializers too. the 'related_name' field is really important here
 
+
+#TODO: validators on serializers!!!
+
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+	meetup_groups = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 	class Meta:
 		model = User
-		fields = ['url', 'username', 'email', 'groups', 'first_name', 'last_name']
+		fields = ['url', 'username', 'email', 'meetup_groups', 'first_name', 'last_name']
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
@@ -15,9 +21,9 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
 		fields = ['name', 'create_date']
 
 class MeetupGroupSerializer(serializers.HyperlinkedModelSerializer):
-	members = UserSerializer(many=True, read_only=True)
-	admin = UserSerializer(many = False, read_only=True)
-	tags = TagSerializer(many = True, read_only=True)
+	members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+	admin = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+	tags = serializers.PrimaryKeyRelatedField(many = True, read_only=True)
 	class Meta:
 		model = MeetupGroup
 		#do i need to include host_id if i am adding a relationship through serializers?
@@ -27,7 +33,8 @@ class MeetupGroupSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-	meetup_group= MeetupGroupSerializer(many=False, read_only=True)
+	meetup_group= serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+	host = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
 	class Meta:
 		model = Event
-		fields = ['name', 'description', 'date', 'address', 'create_date', 'host_id', 'meetup_group_id' ]
+		fields = ['name', 'description', 'date', 'address', 'create_date', 'host', 'meetup_group' ]

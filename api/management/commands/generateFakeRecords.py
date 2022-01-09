@@ -68,7 +68,7 @@ def generateFakeUsers():
 	]
 
 	for curName in userNameDicts:
-		u = User.objects.create(
+		u = User.objects.create_user(
 				first_name=curName['first_name'],
 				last_name=curName['last_name'],
 				username = f"{chr(curCharCode)}tester",

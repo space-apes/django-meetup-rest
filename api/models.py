@@ -1,7 +1,7 @@
 from django.db import models
 #AbstractUser to extend default user model
 #BaseUserManager to overwrite manager if we want more functionanality
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 import datetime
 
@@ -11,7 +11,7 @@ import datetime
 #dont forget to update AUTH_USER_MODEL to settings.py if we want a diff model
 #dont forget to add this model to admin.py if you want admin app access.
 
-class User(AbstractUser):
+class User(AbstractUser, PermissionsMixin):
 	#wow! avoided circular dependency by specifying model as string. cool. 
 
 	#if want to override using 'username' as username field. ex email
@@ -21,8 +21,23 @@ class User(AbstractUser):
 	def __str__(self):
 		return self.username	
 
+#write a custom User manager in order to include hashed passwords 
+#and more advanced User features
+
+class UserManager(BaseUserManager):
+	def create_user(self, username, first_name, last_name, email, password):
+		user = self.model(
+				username = username,
+				first_name=first_name,
+				last_name=last_name,
+				email=email,
+				last_login=datetime.now()
+				)
+		user.set_password(password)
+		user.save(using=self._db)
+
 class MeetupGroup(models.Model):
-	name = models.CharField(max_length=25)
+	name = models.CharField(max_length=25, unique=True)
 	description = models.CharField(max_length=100, default='default description')
 	create_date = models.DateField('date created')
 	members = models.ManyToManyField(User, related_name='meetup_groups')
@@ -34,7 +49,7 @@ class MeetupGroup(models.Model):
 
 class Tag(models.Model):
 	name = models.CharField(max_length=25)
-	create_date = models.DateField('date created')
+	create_date = models.DateField('date_created')
 	meetup_groups = models.ManyToManyField(MeetupGroup, related_name='tags')
 
 	def __str__(self):

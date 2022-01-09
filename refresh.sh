@@ -1,7 +1,10 @@
 #!/bin/bash
-DJANGO_SUPERUSER_PASSWORD=password
+
 echo "flushing db..."
 python3 manage.py flush --no-input
+echo "adding new migrations if any"
+python3 manage.py makemigrations
+python3 manage.py migrate
 echo "populating db with fake records for User, MeetupGroup, Event, Tag"
 python3 manage.py generateFakeRecords
 echo "adding test admin"
