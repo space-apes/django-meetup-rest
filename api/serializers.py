@@ -15,6 +15,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 		model = User
 		fields = ['url', 'username', 'email', 'meetup_groups', 'first_name', 'last_name']
 
+	# if want to create new instances from serializer, had to override create method
+	# to use the User.objhecs.create_user method to capture hashing
+	def create(self, validated_data):
+		return User.objects.create_user(**validated_data)
+
+
 class TagSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = Tag
@@ -27,10 +33,8 @@ class MeetupGroupSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = MeetupGroup
 		#do i need to include host_id if i am adding a relationship through serializers?
-		#NO these are model fields not DB record fields. you are still in python land
+		#NO these are model fields not DB record fields. you are still in python land!
 		fields = ['url', 'name', 'create_date', 'description', 'members', 'admin', 'tags']
-
-
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
 	meetup_group= serializers.PrimaryKeyRelatedField(many=False, read_only=True)

@@ -9,64 +9,58 @@ from api.permissions import (
 		IsSuperUserOrReadOnly, 
 		IsSuperUserOrAdmin, 
 		IsSuperUserOrHost,
-		IsSuperUserOrTargetUser)
+		IsSuperUserOrTargetUser,
+		CustomMeetupPermission
+		)
 
 #retrieve request query parameters like so: 
 	#self.request.query_params.get('make')
 #access slug values from urlconfs with 
 	#self.kwargs.get('slugName')
 
-#useful mixins when using viewsets.GenericViewSet:
-# includes create, list, retrieve operations
-# - ListModelMixin
-# - CreateModelMixin
-# - RetrieveModelMixin
-# - UpdateModelMixin
-# - DestroyModelMixin
 
-
-
-
-#below is using viewsets. super clean but not sure yet how to make more specific 
-#endpoints for relations/nested data
-
+#for explanation on permission classes, see api/permissions.py
 class UserViewSet(viewsets.ModelViewSet):
 	"""
-	API endpoint that allows users to be viewed or edited.
-	Only admin users should be able to see raw User data
+	API endpoint that allows Users to be CRUD'd
 	"""
 	queryset = User.objects.all().order_by('-date_joined')
 	serializer_class = UserSerializer
 	permission_classes = [IsSuperUserOrTargetUser]
-		
-	
+
 class MeetupGroupViewSet(viewsets.ModelViewSet):
 	"""
-	API endpoint that allows meetup groups to be viewed or edited.
-	admin has all permissions
-	all other users have only read permissions
+	API endpoint that allows MeetupGroups to be CRUD'd
 	"""
 
 	serializer_class = MeetupGroupSerializer
-	permission_classes = [IsSuperUserOrReadOnly]
+	permission_classes = [CustomMeetupPermission]
 	queryset = MeetupGroup.objects.all()
 
+	#create method should set admin field to current user. 
+	#TODO: Created groups should have valid tags. 
+
+	def create(self, request, *args, **kwargs):
+		serializer = MeetupGroupSerializer(data=request.data, context={'request': request})
+		if serializer.is_valid():
+			serializer.save(admin=request.user)
+			return Response(serializer.data)
+		return Response(serializer.errors)
 
 class TagViewSet(viewsets.ModelViewSet):
 	"""
-	API endpoint that allows tags to be viewed or editeda
-	all types of users should be able to see tag data
+	API endpoint that allows tags to be CRUD'd
 	"""
 	serializer_class = TagSerializer
-	permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	queryset = Tag.objects.all()
 
 #DONT FORGET TO ADD ISADMINORSELF PERMISSIONS
 class UserMeetupGroupViewSet(viewsets.ModelViewSet):
 	"""
-	API endpoint that allows meetup groups associated with a user to be 
-	viewed. If user is admin, then allow update, partial update, delete
-	on meetups
+	Alternative API endpoint to meetupgroups 
+	that allows meetup groups associated with a user to be only viewed. 
+	Filtered by meetup groups that user is a 'member' of 
 	"""
 	serializer_class = MeetupGroupSerializer
 	permission_classes = [IsSuperUserOrTargetUser]

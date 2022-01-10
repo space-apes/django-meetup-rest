@@ -8,6 +8,10 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'meetup_groups', MeetupGroupViewSet)
 
+
+# TODO: make url endpoints unique strings for meetup groups because its fun.
+# TODO: use nested routers to consolidate urlpattern paths
+
 """
 /users/
 /users/1
