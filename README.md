@@ -9,6 +9,9 @@ Model ->
 	
 TODO: generate documentation
 
+for me, the best way to start building an API is to begin by describing 
+# desired url endpoints and underlying models
+
 # REST API for social meetup type web application
 - TODO: HIGH LEVEL FEATURES
 

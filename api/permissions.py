@@ -32,7 +32,7 @@ class CustomMeetupPermission(permissions.BasePermission):
 			return True
 		elif view.action == 'create':
 			return request.user.is_superuser or request.user.is_authenticated()
-		elif view.action in ['update', 'partial_update', 'delete']:
+		elif view.action in ['update', 'partial_update', 'destroy']:
 			return request.user.is_superuser or request.user == obj.admin
 		else:
 		 	return False

@@ -1,10 +1,13 @@
 from api.models import User, MeetupGroup, Event, Tag
 from .serializers import UserSerializer, MeetupGroupSerializer, TagSerializer, EventSerializer
-from rest_framework import viewsets, permissions, mixins, generics
+from rest_framework import viewsets, permissions, mixins, generics, filters, exceptions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+import re
+from api.exceptions import BadSearchQueryParameterException
 from api.permissions import (
 		IsSuperUserOrReadOnly, 
 		IsSuperUserOrAdmin, 
@@ -36,6 +39,37 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
 	serializer_class = MeetupGroupSerializer
 	permission_classes = [CustomMeetupPermission]
 	queryset = MeetupGroup.objects.all()
+	#add search funcionality here. could also write custom 
+	#search views. 
+	#filter_backends = (filters.SearchFilter,)
+	#search_fields = ['name', 'tags__name']
+	def get_queryset(self):
+		"""
+			if no queryset parameter 'search' is set
+				include all MeetupGroups unless a 'search' query parameter is set
+			else 
+				validate query parameter 'search'
+				include meetup groups w names that match search terms
+				and include meetup groups with tags that match search terms
+		"""
+		searchString = self.request.query_params.get('search')
+		if not searchString:
+			return self.queryset
+		else:
+		 	#basic validation on query parameter 'search'
+			if re.search(r"[^\w\|]", searchString):
+				print(f"views::meetupgroup::get_queryset: searchString is {searchString}")
+				raise BadSearchQueryParameterException
+		
+			meetups_matching = MeetupGroup.objects\
+					   .prefetch_related('tags')\
+					   .filter(Q(name__iregex=searchString) | Q(tags__name__iregex=searchString))\
+					   .distinct()	
+			
+			#TODO: use python sets and union matches based on tag names too
+			return meetups_matching
+			
+
 
 	#create method should set admin field to current user. 
 	#TODO: Created groups should have valid tags. 
@@ -55,7 +89,6 @@ class TagViewSet(viewsets.ModelViewSet):
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 	queryset = Tag.objects.all()
 
-#DONT FORGET TO ADD ISADMINORSELF PERMISSIONS
 class UserMeetupGroupViewSet(viewsets.ModelViewSet):
 	"""
 	Alternative API endpoint to meetupgroups 
