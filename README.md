@@ -22,12 +22,26 @@ for me, the best way to start building an API is to begin by describing
 - includes custom user model and manager
 - includes custom serializers with validators for all models accessed from API
 - includes custom permissions and filters to limit access 
-- includes refresh script to populate DB with test data
-- includes curl script for one-off request-response cycles
+- includes refresh script to populate DB with test data /refresh.sh
+- includes curl script for one-off request-response cycles: /jwtTest.sh
 
-### TO RUN:
-- install django
-- hook up to db through mysite.settings.py
+### to build and run as docker container:a
+- clone git repo to local machine
+- pip3 install -r requirements.txt
+- create a database within your dbms for the project
+- generate a new secret_key 
+- set build-environment specific variables through docker
+	- SECRET_KEY
+	- ALLOWED_HOSTS
+	- DB_ENGINE
+	- DB_HOST
+	- DB_NAME
+	- DB_USER
+	- DB_PASSWORD
+	- ENV_SECRET_KEY
+- determine how to serve static files and python3 manage.py collectstatic
+
+
 - use bash script to create migrations, populate db with fake records, add super user
 - run test server with 'python3 manage.py runserver localhost:62231'
 - navigate web browser to url:port/api/token and supply credentials in JSON body
@@ -37,6 +51,7 @@ for me, the best way to start building an API is to begin by describing
 	- USER
 		-"username":"ftester"
 		-"password":"password"
+		-(can try different users by incrementing/decrementing first letter in username)
 
 ## END POINTS
 - /api-auth/ 
