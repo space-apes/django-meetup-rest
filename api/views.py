@@ -13,7 +13,9 @@ from api.permissions import (
 		IsSuperUserOrAdmin, 
 		IsSuperUserOrHost,
 		IsSuperUserOrTargetUser,
-		CustomMeetupPermission
+		IsAnyUserReadOnly,
+		IsAuthenticatedUserCreating,
+		IsSuperUserOrAdminUpdatingOrDestroying
 		)
 
 #retrieve request query parameters like so: 
@@ -34,15 +36,14 @@ class UserViewSet(viewsets.ModelViewSet):
 class MeetupGroupViewSet(viewsets.ModelViewSet):
 	"""
 	API endpoint that allows MeetupGroups to be CRUD'd
+
+	also query parameter search functionality. 
+		list meetups that do case insensitive match on any search terms against meetup names or meetups with tags that have matching names
 	"""
 
 	serializer_class = MeetupGroupSerializer
-	permission_classes = [CustomMeetupPermission]
+	permission_classes = [IsAnyUserReadOnly|IsAuthenticatedUserCreating|IsSuperUserOrAdminUpdatingOrDestroying]
 	queryset = MeetupGroup.objects.all()
-	#add search funcionality here. could also write custom 
-	#search views. 
-	#filter_backends = (filters.SearchFilter,)
-	#search_fields = ['name', 'tags__name']
 	def get_queryset(self):
 		"""
 			if no queryset parameter 'search' is set
@@ -66,10 +67,13 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
 					   .filter(Q(name__iregex=searchString) | Q(tags__name__iregex=searchString))\
 					   .distinct()	
 			
-			#TODO: use python sets and union matches based on tag names too
 			return meetups_matching
 			
 
+	def get_object(self):
+		m = get_object_or_404(MeetupGroup, pk=self.kwargs['pk'])
+		self.check_object_permissions(self.request, m)
+		return m
 
 	#create method should set admin field to current user. 
 	#TODO: Created groups should have valid tags. 
@@ -80,6 +84,18 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
 			serializer.save(admin=request.user)
 			return Response(serializer.data)
 		return Response(serializer.errors)
+	
+	def partial_update(self,request,*args,**kwargs):
+		print(f"views::meetupgroups::partial_update: getting called!")
+		kwargs['partial'] = False
+		instance = self.get_object()
+		self.check_object_permissions(instance, request)
+		serializer = self.get_serializer(instance, data=request.data, partial=True)
+		if serializer.is_valid(raise_exception=True):
+			self.perform_update(serializer)
+			return Response(serializer.data)
+		return Response(serializer.errors)
+
 
 class TagViewSet(viewsets.ModelViewSet):
 	"""

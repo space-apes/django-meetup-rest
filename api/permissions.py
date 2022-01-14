@@ -15,18 +15,40 @@ class IsSuperUserOrHost(permissions.BasePermission):
 		return request.user.is_superuser or obj.host == request.user
 
 class IsSuperUserOrTargetUser(permissions.BasePermission):
-	"""
-		current user must be super user, or match user endpoint being accessed
-	"""
 	def has_permission(self, request, view):
+		if not request.user.is_authenticated:
+			return False
 		return (request.user.is_superuser) or (request.user.id == int(view.kwargs.get('pk')))
 
+class IsAnyUserReadOnly(permissions.BasePermission):
+	def has_permission(self,request,view):
+		print(f"IsAnyUserReadOnly: {view.action in ['list', 'retrieve']})")
+		return view.action in ['list', 'retrieve']
+
+
+class IsAuthenticatedUserCreating(permissions.BasePermission):
+	def has_permission(self,request,view):
+		print(f'isAuthenticatedUserCreating:\
+				{request.user.is_authenticated and view.action == "create"}')
+		return request.user.is_authenticated and view.action == 'create'
+
+
+class IsSuperUserOrAdminUpdatingOrDestroying(permissions.BasePermission):
+	message= "attempting to update, partial update, or destroy a when not super user or admin"
+	def has_permission(self,request,view):
+		print(f'IsSuperUserOrAdminUpdatingOrDestroying::has_permission')
+		return True
+	
+	def has_object_permission(self,request,view,obj):
+		print(f'IsSuperUserOrAdminUpdatingOrDestroying::has_object_permission')
+		return\
+			(request.user.is_superuser or request.user == obj.admin) and\
+			view.action in ['update', 'partial_update','destroy']
+"""
 class CustomMeetupPermission(permissions.BasePermission):
-	"""
-		any user should be able to GET a listing or detail
-		only super users or authenticated users should be able to create new entries
-		only super users or meetup group admins should be able to update or delete entries
-	"""
+#	any user should be able to GET a listing or detail
+#	only super users or authenticated users should be able to create new entries
+#	only super users or meetup group admins should be able to update or delete entries
 	def has_object_permission(self, request, view, obj):
 		if request.method =='GET' and (view.action in ['list', 'retrieve']):
 			return True
@@ -35,6 +57,7 @@ class CustomMeetupPermission(permissions.BasePermission):
 		elif view.action in ['update', 'partial_update', 'destroy']:
 			return request.user.is_superuser or request.user == obj.admin
 		else:
-		 	return False
+ 		 	return False
+"""
 
 

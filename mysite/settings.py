@@ -6,6 +6,7 @@ see /Readme.md for environment variables that need to be set
 from datetime import timedelta
 from pathlib import Path
 import os
+import mysite.my_env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -105,6 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
 	'DEFAULT_AUTHENTICATION_CLASSES':(
+			#'rest_framework.authentication.BasicAuthentication',
 			'rest_framework_simplejwt.authentication.JWTAuthentication',
 			)
 }
@@ -116,7 +118,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
-    'UPDATE_LAST_LOGIN': False,
+    'UPDATE_LAST_LOGIN': True,
 }
 
 
