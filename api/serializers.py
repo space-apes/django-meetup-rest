@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 
 #TODO: validators on serializers!!!
-
+#TODO: distinct serializers/valdation for different http methods!
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

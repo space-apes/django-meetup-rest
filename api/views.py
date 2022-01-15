@@ -44,6 +44,7 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
 	serializer_class = MeetupGroupSerializer
 	permission_classes = [IsAnyUserReadOnly|IsAuthenticatedUserCreating|IsSuperUserOrAdminUpdatingOrDestroying]
 	queryset = MeetupGroup.objects.all()
+
 	def get_queryset(self):
 		"""
 			if no queryset parameter 'search' is set
@@ -69,40 +70,12 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
 			
 			return meetups_matching
 			
-
-	def get_object(self):
-		m = get_object_or_404(MeetupGroup, pk=self.kwargs['pk'])
-		self.check_object_permissions(self.request, m)
-		return m
-
-	#create method should set admin field to current user. 
-	#TODO: Created groups should have valid tags. 
-
-	def create(self, request, *args, **kwargs):
-		serializer = MeetupGroupSerializer(data=request.data, context={'request': request})
-		if serializer.is_valid():
-			serializer.save(admin=request.user)
-			return Response(serializer.data)
-		return Response(serializer.errors)
-	
-	def partial_update(self,request,*args,**kwargs):
-		print(f"views::meetupgroups::partial_update: getting called!")
-		kwargs['partial'] = False
-		instance = self.get_object()
-		self.check_object_permissions(instance, request)
-		serializer = self.get_serializer(instance, data=request.data, partial=True)
-		if serializer.is_valid(raise_exception=True):
-			self.perform_update(serializer)
-			return Response(serializer.data)
-		return Response(serializer.errors)
-
-
 class TagViewSet(viewsets.ModelViewSet):
 	"""
 	API endpoint that allows tags to be CRUD'd
 	"""
-	serializer_class = TagSerializer
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+	permission_classes = [IsAnyUserReadOnly]
 	queryset = Tag.objects.all()
 
 class UserMeetupGroupViewSet(viewsets.ModelViewSet):
@@ -113,6 +86,7 @@ class UserMeetupGroupViewSet(viewsets.ModelViewSet):
 	"""
 	serializer_class = MeetupGroupSerializer
 	permission_classes = [IsSuperUserOrTargetUser]
+	
 	def get_queryset(self, **kwargs):
 		"""
 		all views in this class should 
