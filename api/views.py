@@ -4,7 +4,7 @@ from rest_framework import viewsets, permissions, mixins, generics, filters, exc
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
 import re
 from api.exceptions import BadSearchQueryParameterException
@@ -22,6 +22,12 @@ from api.permissions import (
 	#self.request.query_params.get('make')
 #access slug values from urlconfs with 
 	#self.kwargs.get('slugName')
+
+
+def index(request):
+	pageName = request.user.username if request.user.is_authenticated else 'anonymous'
+	context = {'pageName': pageName}
+	return render(request, 'api/index.html', context=context)
 
 
 #for explanation on permission classes, see api/permissions.py

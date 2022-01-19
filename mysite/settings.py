@@ -27,7 +27,7 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS_ENV_STRING').split(',')
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    #'django.contrib.auth',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -106,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
 	'DEFAULT_AUTHENTICATION_CLASSES':(
-			#'rest_framework.authentication.BasicAuthentication',
+			'rest_framework.authentication.BasicAuthentication',
 			'rest_framework_simplejwt.authentication.JWTAuthentication',
 			)
 }

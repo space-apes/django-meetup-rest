@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from api.views import UserViewSet, MeetupGroupViewSet, UserMeetupGroupViewSet
+from api.views import index, UserViewSet, MeetupGroupViewSet, UserMeetupGroupViewSet
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 
 router = routers.DefaultRouter()
@@ -33,10 +33,11 @@ router.register(r'meetup_groups', MeetupGroupViewSet)
 """
 
 urlpatterns = [
+	#path('admin/', admin.site.urls),
+	path('', index, name='index'),
 	path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-	path('admin/', admin.site.urls),
-	path('', include(router.urls)),
+	path('api/', include(router.urls)),
 	path('users/<int:user_pk>/meetup_groups/', UserMeetupGroupViewSet.as_view({'get':'list'})),
 	path('users/<int:user_pk>/meetup_groups/<int:meetup_group_pk>/', UserMeetupGroupViewSet.as_view({'get':'retrieve'})),
 	path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
