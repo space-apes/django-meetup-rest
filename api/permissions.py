@@ -16,9 +16,15 @@ class IsSuperUserOrHost(permissions.BasePermission):
 
 class IsSuperUserOrTargetUser(permissions.BasePermission):
 	def has_permission(self, request, view):
-		if not request.user.is_authenticated:
+		if request.user.is_superuser:
+			return True
+		elif request.user.is_authenticated and view.action in ['retrieve','update','destroy']:
+			return True
+		else:
 			return False
-		return (request.user.is_superuser) or (request.user.id == int(view.kwargs.get('pk')))
+
+	def has_object_permissions(self,request, view, obj):
+		return request.user.id == obj.id
 
 class IsAnyUserReadOnly(permissions.BasePermission):
 	meetups = "attempting non read-only action"
@@ -36,6 +42,15 @@ class IsAuthenticatedUserCreating(permissions.BasePermission):
 	
 	def has_object_permission(self,request,view,obj):
 		return request.user.is_authenticated and view.action == 'create'
+
+
+class IsAnonymousUserCreating(permissions.BasePermission):
+	message = "attempting to create when not anonymous"
+	def has_permission(self,request,view):
+		return view.action == 'create'
+	
+	def has_object_permission(self,request,view,obj):
+		return request.user.is_anonymous and view.action == 'create'
 	
 
 class IsSuperUserOrAdminUpdatingOrDestroying(permissions.BasePermission):

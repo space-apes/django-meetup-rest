@@ -3,6 +3,8 @@
 # REST API for social meetup type web application
 - TODO: describe high level features here
 - TODO: generate documentation using swagger or similar
+- TODO: do all TODOs and remove all TODOS
+- TODO: be satisfied with what you have and finish so you can publish this and get a job
 
 # features 
 - uses djangorestframework for REST API

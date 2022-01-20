@@ -15,6 +15,7 @@ from api.permissions import (
 		IsSuperUserOrTargetUser,
 		IsAnyUserReadOnly,
 		IsAuthenticatedUserCreating,
+		IsAnonymousUserCreating,
 		IsSuperUserOrAdminUpdatingOrDestroying
 		)
 
@@ -37,7 +38,7 @@ class UserViewSet(viewsets.ModelViewSet):
 	"""
 	queryset = User.objects.all().order_by('-date_joined')
 	serializer_class = UserSerializer
-	permission_classes = [IsSuperUserOrTargetUser]
+	permission_classes = [IsSuperUserOrTargetUser, IsAnonymousUserCreating]
 
 class MeetupGroupViewSet(viewsets.ModelViewSet):
 	"""
@@ -91,28 +92,36 @@ class UserMeetupGroupViewSet(viewsets.ModelViewSet):
 	Filtered by meetup groups that user is a 'member' of 
 	"""
 	serializer_class = MeetupGroupSerializer
-	permission_classes = [IsSuperUserOrTargetUser]
+	permission_classes = [IsSuperUserOrReadOnly]
 	
 	def get_queryset(self, **kwargs):
 		"""
 		all views in this class should 
 		reference only meetupgroups that are associated with the current user
 		"""
-		user = get_object_or_404(User, id=self.kwargs.get('user_pk'))
-		meetup_queryset = user.meetup_groups.all()
+		user = self.request.user
+		#user = get_object_or_404(User, id=self.kwargs.get('user_pk'))
+		#meetup_queryset = user.meetup_groups.all()
+		meetup_queryset = get_list_or_404(MeetupGroup, admin=user)
+		if meetup_queryset:
+			print("HOORAY I FOUND A FILTERED QUERYSET!")
+		"""
 		if meetup_queryset:
 			return meetup_queryset
 		else:
 		 	raise Http404("this user is not associated with any groups")
+		"""
 
+	"""
 	@action(detail=False, methods=['get'])
 	def list(self, request, *args, **kwargs):
 		meetups_from_user = self.get_queryset()
 		return Response(self.get_serializer(meetups_from_user, many=True).data)
-
+	"""
+	"""
 	@action(detail=True, methods=['get'])
 	def detail(self, request, *args, **kwargs):
 		meetups_from_user = self.get_queryset()
 		specified_meetup = get_object_or_404(MeetupGroup, id=self.kwargs.get('user_pk'))
 		return Response(self.get_serializer(specified_meetup))
-
+	"""
