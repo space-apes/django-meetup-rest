@@ -1,8 +1,10 @@
 # desired url endpoints and underlying models
 
 # REST API for social meetup type web application
+- TODO: prevent CSRF attacks
 - TODO: describe high level features here
 - TODO: generate documentation using swagger or similar
+	- check drf official docs for integrating swagger
 - TODO: do all TODOs and remove all TODOS
 - TODO: be satisfied with what you have and finish so you can publish this and get a job
 

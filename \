@@ -24,7 +24,7 @@ class acquireTokenTestCase(TestCase):
     """
     def test_anonymous_can_not_get_token(self):
         response = Client().post(
-                reverse('token_obtain_pair'),
+                reverse('token-obtain-pair'),
                 anonymous_credential_data,
                 Content_type="application/json"
                 )
@@ -32,8 +32,7 @@ class acquireTokenTestCase(TestCase):
         self.assertFalse('access' in response.data.keys())
 	
     def test_valid_authenticated_can_get_token(self):
-        response = Client().post(
-                reverse('token_obtain_pair'),
+        response = Client().post(reverse('token-obtain-pair'),
                 valid_user_credential_data,
                 Content_type="application/json"
                 )
@@ -41,17 +40,15 @@ class acquireTokenTestCase(TestCase):
         self.assertTrue('access' in response.data.keys())
 
     def test_invalid_authenticated_can_get_token(self):
-        response = Client().post(
-                reverse('token_obtain_pair'),
-                invalid_user_credential_data,
+        response = Client().post(reverse('token-obtain-pair'),
+                self.invalid_user_credential_data,
                 Content_type="application/json"
                 )
         self.assertEqual(response.status_code, 200)
         self.assertTrue('access' in response.data.keys())
 
     def test_superuser_can_get_token(self):
-        response = Client().post(
-                reverse('token_obtain_pair'),
+        response = Client().post(reverse('token-obtain-pair'),
                 superuser_credential_data,
                 Content_type="application/json"
                 )
@@ -60,43 +57,16 @@ class acquireTokenTestCase(TestCase):
 
 
 class EndpointTestCase(TestCase):
-    """base class for all endpoint tests
+    """an abstract parent class for all endpoint tests
         - gets tokens for all types of authenticated users
-        - adds a 'get_response' helper method to generate responses from request data
-        - adds run_test_matrix method to run assertion tests for each request in self.permissions_matrix
+        - 'declares prototype methods' for each test that should be run on endpoint
     """
-
-
-    def __init__(self, *args, **kwargs):
+    def setUp(self):
         """
-            - describes necessary fields in any child classes derived from this one
-            - gets JWT authentication tokens for child classes. do not need to do that in child classes
+            acquire jwt tokens for anonymous,valid,invalid,and super users
         """
-        super(EndpointTestCase, self).__init__(*args, **kwargs)
-
-        #should be set in concrete EndPointTestCase
-        self.base_url = ""
-        self.valid_slug = ""
-
-        #for each EndpontTestCase, a permissions matrix will be used
-        # and the self.run_test_matrix method should be called to do the following:
-        #   1. call self.get_response to generate jwt token and get a response from permission data   
-        #   2. do an assertion test to compare response.status_code to exp_code
-
-        #placeholder to show format of self.permissions_matrix. this should be populated in each EndpontTestCase's constructors 
-        #and should have entries for each desired test
-        self.permissions_matrix = [
-                {"user_type":"anon", "http_method":"get", "data":None, "slug":"", "exp_data":None, "exp_code":401},
-                {"user_type":"anon", "http_method":"post", "data":{"email": "bob@test.com"}, "slug":"", "exp_data": {"field": "email", "value": "bob@test.com"},"exp_code":401},
-                {"user_type":"anon", "http_method":"patch", "data":{"email": "bobby2@test.com"}, "slug":"", "exp_data": {"field": "email", "value": "bobby2@test.com"},"exp_code":401}
-
-
-        ]
-
-
         #no token available for anonymous users
         self.anonymous_access_token = ""
-
         self.valid_user_access_token = Client().post(
                 reverse('token_obtain_pair'),
                 valid_user_credential_data,
@@ -111,7 +81,7 @@ class EndpointTestCase(TestCase):
                 reverse('token_obtain_pair'),
                 superuser_credential_data,
                 'application/json').data['access']
-       
+
     def get_response(self, user_type, http_method, base_url, slug="", data=None):
         """
             helper function to get response object. 
@@ -198,60 +168,121 @@ class EndpointTestCase(TestCase):
             logger.error('invalid http method')
             return None
 
-    def run_test_matrix(self):
-        """runs all tests from self.permissions_matrix
-        """
-        for perm in self.permissions_matrix:
-            response = self.get_response(
-                    user_type=perm['user_type'],
-                    http_method=perm['http_method'],
-                    base_url=self.base_url,
-                    slug=self.valid_slug,
-                    data=perm['data']
-                    )
-            self.assertEqual(response.status_code, perm['exp_code'], msg=str(perm))
-            if perm['exp_data']:
-                field = perm['exp_data']['field']
-                self.assertEqual(response.data[field], perm['exp_data']['value'], msg=str(perm))
+    def test_anonymous_get_list(self):
+        pass
+    def test_anonymous_get_detail(self):
+        pass
+    def test_anonymous_post(self):
+        pass
+    def test_anonymous_put(self):
+        pass
+    def test_anonymous_patch(self):
+        pass
+    def test_anonymous_delete(self):
+        pass
 
+    def test_valid_get_list(self):
+        pass
+    def test_valid_get_detail(self):
+        pass
+    def test_valid_post(self):
+        pass
+    def test_valid_put(self):
+        pass
+    def test_valid_patch(self):
+        pass
+    def test_valid_delete(self):
+        pass
 
+    def test_invalid_get_list(self):
+        pass
+    def test_invalid_get_detail(self):
+        pass
+    def test_invalid_post(self):
+        pass
+    def test_invalid_put(self):
+        pass
+    def test_invalid_patch(self):
+        pass
+    def test_invalid_delete(self):
+        pass
 
+    def test_super_get_list(self):
+        pass
+    def test_super_get_detail(self):
+        pass
+    def test_super_post(self):
+        pass
+    def test_super_put(self):
+        pass
+    def test_super_patch(self):
+        pass
+    def test_super_delete(self):
+        pass
 
 class UsersEndpointTestCase(EndpointTestCase):
-    def __init__(self, *args, **kwargs):
-        super(UsersEndpointTestCase, self).__init__(*args, **kwargs)
-
+    def setUp(self):
         self.base_url = '/api/users/'
-        self.valid_slug = str(User.objects.get(username=valid_user_credential_data['username']).id)+'/'
-        
-        self.update_email_data = {"email": "updatedEmail@test.com"}
+        self.valid_slug = User.objects.get(username=valid_user_credential_data['username']).id+'/'
 
-        self.new_user_data = {
-                "username":"brandNewUser",
-                "password":"password",
-                "email":"brandNewUser@test.com"
-                }
-        self.updated_user_data = {
-                "username":"brandNewUser",
-                "password":"password",
-                "email":"brandNewUser@test.com"
-                }
+    def test_anonymous_get_list(self):
+        response = self.get_response(
+                user_type='anon',
+                http_method='get',
+                base_url=self.base_url,
+                slug="",
+                data=None
+                )
+        self.assertEqual(response.status_code, 401)
+    def test_anonymous_get_detail(self):
+        pass
+    def test_anonymous_post(self):
+        pass
+    def test_anonymous_put(self):
+        pass
+    def test_anonymous_patch(self):
+        pass
+    def test_anonymous_delete(self):
+        pass
 
-        self.permissions_matrix = [
-                {"user_type":"anon", "http_method":"get", "data":None, "slug":"", "exp_data": None, "exp_code":401},
-                {"user_type":"anon", "http_method":"get", "data":None, "slug":self.valid_slug,"exp_data": None, "exp_code":401},
-                {"user_type":"anon", "http_method":"post", "data":self.new_user_data, "slug":"", "exp_data":{"field": "username", "value":"brandNewUser"}, "exp_code":200},
-                {"user_type":"anon", "http_method":"put", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": None, "exp_code":401},
-                {"user_type":"anon", "http_method":"patch", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": None, "exp_code":401},
-                {"user_type":"anon", "http_method":"delete", "data":None, "slug":self.valid_slug, "exp_data": None, "exp_code":401},
+    def test_valid_get_list(self):
+        pass
+    def test_valid_get_detail(self):
+        pass
+    def test_valid_post(self):
+        pass
+    def test_valid_put(self):
+        pass
+    def test_valid_patch(self):
+        pass
+    def test_valid_delete(self):
+        pass
 
-                {"user_type":"valid", "http_method":"get", "data":None, "slug":"", "exp_data": None, "exp_code":403},
-                {"user_type":"valid", "http_method":"get", "data":None, "slug":self.valid_slug, "exp_data": {'field':'username', 'value':valid_user_credential_data['username']}, "exp_code":200},
-                {"user_type":"valid", "http_method":"post", "data":self.new_user_data, "slug":"", "exp_data":None, "exp_code": 403},
-                {"user_type":"valid", "http_method":"put", "data":self.new_user_data, "slug":self.valid_slug, "exp_data": {'field':'username', 'value':self.new_user_data['username']}, "exp_code":200},
-                {"user_type":"valid", "http_method":"patch", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": {'field':'email', 'value':self.update_email_data['email']}, "exp_code":200},
-                {"user_type":"valid", "http_method":"delete", "data":None, "slug":self.valid_slug, "exp_data": None, "exp_code":200},
-        ]
+    def test_invalid_get_list(self):
+        pass
+    def test_invalid_get_detail(self):
+        pass
+    def test_invalid_post(self):
+        pass
+    def test_invalid_put(self):
+        pass
+    def test_invalid_patch(self):
+        pass
+    def test_invalid_delete(self):
+        pass
 
-    def test_all_user(self):
-        self.run_test_matrix()
+    def test_super_get_list(self):
+        pass
+    def test_super_get_detail(self):
+        pass
+    def test_super_post(self):
+        pass
+    def test_super_put(self):
+        pass
+    def test_super_patch(self):
+        pass
+    def test_super_delete(self):
+        pass
+
+
+            

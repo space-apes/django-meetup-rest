@@ -38,7 +38,7 @@ class UserViewSet(viewsets.ModelViewSet):
 	"""
 	queryset = User.objects.all().order_by('-date_joined')
 	serializer_class = UserSerializer
-	permission_classes = [IsSuperUserOrTargetUser, IsAnonymousUserCreating]
+	permission_classes = [IsSuperUserOrTargetUser|IsAnonymousUserCreating]
 
 class MeetupGroupViewSet(viewsets.ModelViewSet):
 	"""
@@ -82,7 +82,6 @@ class TagViewSet(viewsets.ModelViewSet):
 	API endpoint that allows tags to be CRUD'd
 	"""
 	permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-	permission_classes = [IsAnyUserReadOnly]
 	queryset = Tag.objects.all()
 
 class UserMeetupGroupViewSet(viewsets.ModelViewSet):
@@ -112,16 +111,3 @@ class UserMeetupGroupViewSet(viewsets.ModelViewSet):
 		 	raise Http404("this user is not associated with any groups")
 		"""
 
-	"""
-	@action(detail=False, methods=['get'])
-	def list(self, request, *args, **kwargs):
-		meetups_from_user = self.get_queryset()
-		return Response(self.get_serializer(meetups_from_user, many=True).data)
-	"""
-	"""
-	@action(detail=True, methods=['get'])
-	def detail(self, request, *args, **kwargs):
-		meetups_from_user = self.get_queryset()
-		specified_meetup = get_object_or_404(MeetupGroup, id=self.kwargs.get('user_pk'))
-		return Response(self.get_serializer(specified_meetup))
-	"""
