@@ -12,3 +12,38 @@ WARNING:django.request:Unauthorized: /api/users/
 WARNING:django.request:Unauthorized: /api/users/
 WARNING:django.request:Unauthorized: /api/users/6/
 WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+ERROR:django.security.DisallowedHost:Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+WARNING:django.request:Bad Request: /api/token/
+ERROR:django.security.DisallowedHost:Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+WARNING:django.request:Bad Request: /api/token/
+ERROR:django.security.DisallowedHost:Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+WARNING:django.request:Bad Request: /api/token/
+ERROR:django.security.DisallowedHost:Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+WARNING:django.request:Bad Request: /api/token/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/

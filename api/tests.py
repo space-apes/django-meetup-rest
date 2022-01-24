@@ -25,7 +25,7 @@ class acquireTokenTestCase(TestCase):
         - test that super user CAN acquire a token
     """
     #def test_anonymous_can_not_get_token(self):
-    #    response = APIClient().post(
+    #    response = Client().post(
     #            reverse('token_obtain_pair'),
     #            anonymous_credential_data,
     #            format='json',
@@ -35,28 +35,28 @@ class acquireTokenTestCase(TestCase):
     #    self.assertFalse('access' in response.data.keys())
 	
     def test_valid_authenticated_can_get_token(self):
-        response = APIClient().post(
+        response = Client().post(
                 reverse('token_obtain_pair'),
                 valid_user_credential_data,
-                format='json'
+                extra={'CONTENT_TYPE':'application/json'}
                 )
         self.assertEqual(response.status_code, 200)
         self.assertTrue('access' in response.data.keys())
 
     def test_invalid_authenticated_can_get_token(self):
-        response = APIClient().post(
+        response = Client().post(
                 reverse('token_obtain_pair'),
                 invalid_user_credential_data,
-                format='json'
+                extra={'CONTENT_TYPE':'application/json'}
                 )
         self.assertEqual(response.status_code, 200)
         self.assertTrue('access' in response.data.keys())
 
     def test_superuser_can_get_token(self):
-        response = APIClient().post(
+        response = Client().post(
                 reverse('token_obtain_pair'),
                 superuser_credential_data,
-                format='json'
+                extra={'CONTENT_TYPE':'application/json'}
                 )
         self.assertEqual(response.status_code, 200)
         self.assertTrue('access' in response.data.keys())
@@ -98,27 +98,27 @@ class EndpointTestCase(TestCase):
         ]
 
 
-        self.valid_user_access_token = APIClient().post(
+        self.valid_user_access_token = Client().post(
                 reverse('token_obtain_pair'),
                 valid_user_credential_data,
-                format='json',
+                extra={'CONTENT_TYPE':'application/json'}
                 ).data['access']
 
-        self.invalid_user_access_token = APIClient().post(
+        self.invalid_user_access_token = Client().post(
                 reverse('token_obtain_pair'),
                 invalid_user_credential_data,
-                format='json'
+                extra={'CONTENT_TYPE':'application/json'}
                 ).data['access']
 
-        self.superuser_access_token = APIClient().post(
+        self.superuser_access_token = Client().post(
                 reverse('token_obtain_pair'),
                 superuser_credential_data,
-                format='json'
+                extra={'CONTENT_TYPE':'application/json'}
                 ).data['access']
        
     def get_response(self, user_type, http_method, base_url, slug="", data=None):
         """
-            builds APIClient request method to get a response object
+            builds Client request method to get a response object
             allows us to specify user from a couple categories of users {'anon', 'valid', 'invalid', 'super'}
             takes care of applying the correct JWT token that is associated with this user type
             avoids attaching any authorization header fields if type is 'anon'
@@ -166,7 +166,7 @@ class EndpointTestCase(TestCase):
             #logging.error(f"api:tests:get_response:: if user is not anon, then token is: {tokenDict[user_type]}\nheader_kwargs_dict is: {header_kwargs_dict}")
 
         if http_method == 'get':
-            return APIClient().get(
+            return Client().get(
                     base_url+slug,
                     extra=header_kwargs_dict
                     #HTTP_AUTHORIZATION="Bearer "+token
@@ -176,7 +176,7 @@ class EndpointTestCase(TestCase):
             if not data:
                 logging.error('post needs data')
                 return None
-            return APIClient().post(
+            return Client().post(
                     path=base_url+slug,
                     data=data,
                     extra=header_kwargs_dict
@@ -186,7 +186,7 @@ class EndpointTestCase(TestCase):
             if not data:
                 logging.error('put needs data')
                 return None
-            return APIClient().put(
+            return Client().put(
                     base_url+slug,
                     data,
                     extra=header_kwargs_dict
@@ -196,14 +196,14 @@ class EndpointTestCase(TestCase):
             if not data:
                 logging.error('patch needs data')
                 return None
-            return APIClient().patch(
+            return Client().patch(
                     base_url+slug,
                     data,
                     extra=header_kwargs_dict
                     )
 
         elif http_method == 'delete':
-            return APIClient().delete(
+            return Client().delete(
                     base_url+slug,
                     )
         else:
@@ -250,27 +250,27 @@ class UsersEndpointTestCase(EndpointTestCase):
                 }
 
         self.permissions_matrix = [
-                 {"user_type":"anon", "http_method":"get", "data":None, "slug":"", "exp_data": None, "exp_code":401},
+#                 {"user_type":"anon", "http_method":"get", "data":None, "slug":"", "exp_data": None, "exp_code":401},
 #                {"user_type":"anon", "http_method":"get", "data":None, "slug":self.valid_slug,"exp_data": None, "exp_code":401},
 #                {"user_type":"anon", "http_method":"post", "data":self.new_user_data, "slug":"", "exp_data":{"field": "username", "value":self.new_user_data['username']}, "exp_code":201},
 #                {"user_type":"anon", "http_method":"put", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": None, "exp_code":401},
 #                {"user_type":"anon", "http_method":"patch", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": None, "exp_code":401},
 #                {"user_type":"anon", "http_method":"delete", "data":None, "slug":self.valid_slug, "exp_data": None, "exp_code":401},
 #
-                 {"user_type":"valid", "http_method":"get", "data":None, "slug":"", "exp_data": None, "exp_code":403},
-                 #{"user_type":"valid", "http_method":"get", "data":None, "slug":self.valid_slug, "exp_data": {'field':'username', 'value':valid_user_credential_data['username']}, "exp_code":200},
-#                {"user_type":"valid", "http_method":"post", "data":self.new_user_data, "slug":"", "exp_data":None, "exp_code": 403},
+#                 {"user_type":"valid", "http_method":"get", "data":None, "slug":"", "exp_data": None, "exp_code":403},
+                  {"user_type":"valid", "http_method":"get", "data":None, "slug":self.valid_slug, "exp_data": {'field':'username', 'value':valid_user_credential_data['username']}, "exp_code":200},
+#                 {"user_type":"valid", "http_method":"post", "data":self.new_user_data, "slug":"", "exp_data":None, "exp_code": 403},
 #                {"user_type":"valid", "http_method":"put", "data":self.new_user_data, "slug":self.valid_slug, "exp_data": {'field':'username', 'value':self.new_user_data['username']}, "exp_code":200},
-#                {"user_type":"valid", "http_method":"patch", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": {'field':'email', 'value':self.update_email_data['email']}, "exp_code":200},
+                 {"user_type":"valid", "http_method":"patch", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": {'field':'email', 'value':self.update_email_data['email']}, "exp_code":200},
 #                {"user_type":"valid", "http_method":"delete", "data":None, "slug":self.valid_slug, "exp_data": None, "exp_code":200},
-
+#
 #                {"user_type":"invalid", "http_method":"get", "data":None, "slug":"", "exp_data": None, "exp_code":403},
 #                {"user_type":"invalid", "http_method":"get", "data":None, "slug":self.valid_slug, "exp_data": None, "exp_code":403},
 #                {"user_type":"invalid", "http_method":"post", "data":self.new_user_data, "slug":"", "exp_data":None, "exp_code": 403},
 #                {"user_type":"invalid", "http_method":"put", "data":self.new_user_data, "slug":self.valid_slug, "exp_data": None, "exp_code":403},
 #                {"user_type":"invalid", "http_method":"patch", "data":self.update_email_data, "slug":self.valid_slug, "exp_data": None, "exp_code":403},
 #                {"user_type":"invalid", "http_method":"delete", "data":None, "slug":self.valid_slug, "exp_data": None, "exp_code":200},
-        ]
+      ]
 
     def test_all_user(self):
         self.run_test_matrix()

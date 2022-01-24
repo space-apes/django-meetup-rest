@@ -1,4 +1,3 @@
-sgiref==3.4.1
 #backports.zoneinfo==0.2.1
 Django==4.0.1
 django-filter==21.1
@@ -12,4 +11,5 @@ pytz==2021.3
 sqlparse==0.4.2
 zipp==3.7.0
 gunicorn
-drf-nested-routers=0.93.4
+drf-nested-routers==0.93.4
+ipython
