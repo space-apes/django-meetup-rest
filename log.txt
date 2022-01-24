@@ -1,0 +1,14 @@
+WARNING:django.request:Unauthorized: /api/users/
+ERROR:root:api:tests:get_response:: if user is not anon, then token is: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQyOTcxODA2LCJpYXQiOjE2NDI5NzE1MDYsImp0aSI6IjM2Y2FmZDAzNzU5OTQ3ZTE5YjliMTI5MGI2OTVmYzI1IiwidXNlcl9pZCI6Nn0.jFtuVfVrB1liL_AjHyZxCpYsD_omqVM8yKLMpxlJfQg
+header_kwargs_dict is: {'format': 'json', 'CONTENT_TYPE': 'application/json', 'HTTP_AUTHORIZATION': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQyOTcxODA2LCJpYXQiOjE2NDI5NzE1MDYsImp0aSI6IjM2Y2FmZDAzNzU5OTQ3ZTE5YjliMTI5MGI2OTVmYzI1IiwidXNlcl9pZCI6Nn0.jFtuVfVrB1liL_AjHyZxCpYsD_omqVM8yKLMpxlJfQg'}
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/
+WARNING:django.request:Unauthorized: /api/users/6/
+WARNING:django.request:Unauthorized: /api/users/6/

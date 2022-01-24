@@ -5,12 +5,9 @@
 #arg2 is password
 #arg3 is http method 
 #arg4 is endpoint (EX: /users/)
-#arg5 is optional json string to send (WRAP IN DOUBLE QUOTES)
+#arg5 is optional json string to send
 
-if [ $# != 5 ]; then
-	echo "usage is ./jwtTest.sh username password http_method endpoint jsonString"
-	exit 1
-fi
+#if ! [ [ -z "$1" ] && []
 
 tokenResponse=$(curl \
 		-q \
@@ -35,7 +32,6 @@ refreshToken=$(echo $tokenResponse | sed 's/^.*refresh\":\"\(.*\)\",.*/\1/')
 
 
 curl \
-	     -X $3\
+	     -X GET \
 	     -H  "Authorization: Bearer ${accessToken}"\
-	     -d $5\
-	     "http://localhost:62231$4"
+	     "http://localhost:62231$3"
