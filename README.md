@@ -1,8 +1,10 @@
 # desired url endpoints and underlying models
 
 # REST API for social meetup type web application
+- TODO: 
 - TODO: prevent CSRF attacks
 - TODO: describe high level features here
+- TODO: update docker build instructions
 - TODO: generate documentation using swagger or similar
 	- check drf official docs for integrating swagger
 - TODO: do all TODOs and remove all TODOS
@@ -19,7 +21,7 @@
 - includes bash/curl script for one-off request-response cycles: /jwtTest.sh
 - includes tests for all models and endpoints/permissions
 
-### to build and run as docker container:a
+### to build and run as docker container:aa
 - clone git repo to local machine
 - pip3 install -r requirements.txt
 - create a database within your dbms for the project

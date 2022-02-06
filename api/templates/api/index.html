@@ -1,143 +1,153 @@
-<h1> Welcome to Meetup Street, {{ pageName }}! </h1>
+{% load static %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Meetup Street Frontend Placeholder </title>
+		<style>
+			img{
+				width:100%;
+			}
+			table,th,td {
+				border: 2px solid black;
+			}
+		</style>
+	</head>
 
-<ul>
-	<li>
-		This is a Django Rest Framework based RESTful api for a meetup type social media webapplication.
-	</li>
-	<li>
-		Endpoints serve and accept JSON data.
-	</li>
-	<li>
-		The root url is a placeholder for a front-end endpoint.
-	</li>	
-	<li>
-		Authentication is meant to be handled through JSON Web Tokens. However, basic username/password authentication can also be used for demo purposes.
-	</li>
-	<li>
-		See the README.md for credentials!
-	</li>
-</ul>
+	<body>
+		<h1> Welcome to Meetup Street, {{ pageName }}! </h1>
 
-<h2>to access the api, try any of the following: </h2>
-<ul>
-	<li>/api/ login or see other endpoints here
-	</li>
-	<li>/api/users/
 		<ul>
 			<li>
-				superuser: {C,R}
+				This a REST API for a meetup type social media web application built using the Django Rest Framework.
 			</li>
 			<li>
-				anonymous: {C}
+				Endpoints serve and accept JSON data.
+			</li>
+			<li>
+				The root url is a placeholder for a front-end endpoint.
+			</li>	
+			<li>
+				Authentication is handled through JSON Web Tokens. However, basic username/password authentication has been enabled for demo purposes.
+			</li>
+			<li>
+				See the README.md for credentials.
 			</li>
 		</ul>
-	</li>
-	<li>/api/users/&ltuser_pk&gt/
+
+		<h2> DB Schema: </h2>
+		<img src="{% static 'api/img/meetup_db_1.drawio.png' %}">
+
+		<h2>to access the api, try any of the following: </h2>
 		<ul>
+			<li> <b>/api/: </b> login or see other endpoints here </li>
 			<li>
-				superuser: {R,U,D}
+				<h4> /api/users/ </h4>
+				<table>
+					<tr> <th> </th> <th>GET</th> <th> POST </th> <th> PUT </th> <th> PATCH </th> <th> DELETE </th> <th> HEAD </th> <th> OPTIONS </th> </tr>
+					<!-- <tr> <th>x</th> <td>x  </td> <td>x     </td> <td>x    </td> <td>x      </td> <td>x       </td> <td>x     </td> <td>x        </td> </tr> -->
+					<tr> <th>superuser</th> <td>x  </td> <td>x     </td> <td>    </td> <td>      </td> <td>       </td> <td>x     </td> <td>x        </td> </tr>
+					<tr> <th>anonymous user</th> <td>  </td> <td>x     </td> <td>    </td> <td>      </td> <td>       </td> <td>     </td> <td>        </td> </tr>
+				</table>
 			</li>
 			<li>
-				user.pk == pk: {R,U,D}
-			</li>
-		</ul>
-	</li>
-	<li>/api/meetup_groups/
-		<ul>
-			<li>
-				superuser: {C,R}
-			</li>
-			<li>
-				authenticated user: {C}
+				<h4> /api/users/&ltuser_pk&gt/ </h4>
+				<table>
+					<tr> <th> </th> <th>GET</th> <th> POST </th> <th> PUT </th> <th> PATCH </th> <th> DELETE </th> <th> HEAD </th> <th> OPTIONS </th> </tr>
+					<!-- <tr> <th>x</th> <td>x  </td> <td>x     </td> <td>x    </td> <td>x      </td> <td>x       </td> <td>x     </td> <td>x        </td> </tr> -->
+					<tr> <th>superuser</th> <td>x  </td> <td>     </td> <td>x    </td> <td>x      </td> <td>x       </td> <td>x     </td> <td>x        </td> </tr>
+					<tr> <th>targeted user</th> <td>x </td> <td>     </td> <td>x    </td> <td>x      </td> <td>x       </td> <td>x     </td> <td>x        </td> </tr>
+				</table>
 			</li>
 			<li>
-				any user: {R}
+				<h4> /api/meetup_groups/ </h4>
+				<table>
+					<tr> <th> </th> <th>GET</th> <th> POST </th> <th> PUT </th> <th> PATCH </th> <th> DELETE </th> <th> HEAD </th> <th> OPTIONS </th> </tr>
+					<tr> <th>superuser</th> <td>x  </td> <td>x     </td> <td>    </td> <td>      </td> <td>       </td> <td>x     </td> <td>x        </td> </tr>
+					<tr> <th>authenticated user</th> <td>x  </td> <td>x     </td> <td>    </td> <td>      </td> <td>       </td> <td>x     </td> <td>x        </td> </tr>
+					<tr> <th>anonymous user</th> <td>x  </td> <td>     </td> <td>    </td> <td>      </td> <td>       </td> <td>x     </td> <td>x        </td> </tr>
+				</table>
+			</li>
+			<li>
+				<h4> /api/meetup_groups/&ltmeetup_pk&gt/ </h4>
+				<table>
+					<tr> <th> </th>                 <th>GET</th> <th> POST </th> <th> PUT </th> <th> PATCH </th> <th> DELETE </th> <th> HEAD </th> <th> OPTIONS </th> </tr>
+					<tr> <th>superuser</th>         <td>x  </td> <td>      </td> <td>x    </td> <td>x      </td> <td>x       </td> <td>x     </td> <td>x        </td> </tr>
+					<tr> <th>meetup_group admin</th><td>x  </td> <td>      </td> <td>x    </td> <td>x      </td> <td>x       </td> <td>x     </td> <td>x        </td> </tr>
+					<tr> <th>authenticated user</th><td>x  </td> <td>x     </td> <td>     </td> <td>       </td> <td>        </td> <td>x     </td> <td>x        </td> </tr>
+					<tr> <th>anonymous user</th>    <td>x  </td> <td>      </td> <td>     </td> <td>       </td> <td>        </td> <td>x     </td> <td>x        </td> </tr>
+				</table>
+			</li>
+			<li>
+				<h4> /api/events/ </h4>
+				<ul>
+					<li>
+						superuser: {C,R}
+					</li>
+					<li>
+						any admin of a meetup_group: {C,R}
+					</li>
+					<li>
+						any user: {R}
+					</li>
+
+				</ul>
+			</li>
+			<li>/api/events/&ltevent_pk&gt/
+				<ul>
+					<li>
+						superuser: {R,U,D}
+					</li>
+					<li>
+						the host of the event: {R,U,D}
+					</li>
+					<li>
+						any user: {R}
+					</li>
+
+				</ul>
 			</li>
 
-		</ul>
-	</li>
-	<li>/api/meetup_groups/&ltmeetup_pk&gt/
-		<ul>
-			<li>
-				superuser: {R,U,D}
+			<li>/api/tags/
+				<ul>
+					<li>
+						superuser: {C,R}
+					</li>
+					<li>
+						any authenticated user: {C,R}
+					</li>
+					<li>
+						any user: {R}
+					</li>
+
+				</ul>
 			</li>
-			<li>
-				admin of meetup_group: {R,U,D}
+			<li>/api/tags/&lttag_pk&gt/
+				<ul>
+					<li>
+						superuser: {U,D}
+					</li>
+					<li>
+						any user: {R}
+					</li>
+
+				</ul>
 			</li>
-			<li>
-				any user: {R}
+			<li>/api/users/&ltuser_pk&gt/meetup_groups/ meetup_groups filtered by user membership
+				<ul>
+					<li>
+						user.id == user_pk: {R}
+					</li>
+				</ul>
+			</li>
+			<li>/api/meetup_groups/&ltmeetup_group_pk&gt/events/ events filtered by association with meetup_group
+				<ul>
+					<li>
+						users who are members of meetup group: {R}
+					</li>
+				</ul>
 			</li>
 
-		</ul>
-	</li>
-	<li>/api/events/
-		<ul>
-			<li>
-				superuser: {C,R}
-			</li>
-			<li>
-				any admin of a meetup_group: {C,R}
-			</li>
-			<li>
-				any user: {R}
-			</li>
 
 		</ul>
-	</li>
-	<li>/api/events/&ltevent_pk&gt/
-		<ul>
-			<li>
-				superuser: {R,U,D}
-			</li>
-			<li>
-				the host of the event: {R,U,D}
-			</li>
-			<li>
-				any user: {R}
-			</li>
-
-		</ul>
-	</li>
-
-	<li>/api/tags/
-		<ul>
-			<li>
-				superuser: {C,R}
-			</li>
-			<li>
-				any authenticated user: {C,R}
-			</li>
-			<li>
-				any user: {R}
-			</li>
-
-		</ul>
-	</li>
-	<li>/api/tags/&lttag_pk&gt/
-		<ul>
-			<li>
-				superuser: {U,D}
-			</li>
-			<li>
-				any user: {R}
-			</li>
-
-		</ul>
-	</li>
-	<li>/api/users/&ltuser_pk&gt/meetup_groups/ meetup_groups filtered by user membership
-		<ul>
-			<li>
-				user.id == user_pk: {R}
-			</li>
-		</ul>
-	</li>
-	<li>/api/meetup_groups/&ltmeetup_group_pk&gt/events/ events filtered by association with meetup_group
-		<ul>
-			<li>
-				users who are members of meetup group: {R}
-			</li>
-		</ul>
-	</li>
-
-
-</ul>
+	</body>
+</html>
