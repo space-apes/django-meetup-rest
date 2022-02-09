@@ -5,14 +5,14 @@ services:
     ports:
       - 62231:62231
     environment:
-      - DB_ENGINE=django.db.backends.mysql
-      - DB_HOST=db
-      - DB_NAME=meetup_db
-      - DB_USER=root
-      - DB_PASSWORD=t4nz4n14
-      - ENV_SECRET_KEY=django-insecure-&(!u@j$$*__n0jrommy7bg%wa61x=$$avjgu2j7(4226qnonx#37
+      - DB_ENGINE=${DB_ENGINE}
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - ENV_SECRET_KEY=${ENV_SECRET_KEY}
       #comma separated list but in settings.py need to split at comma for a list.
-      - ALLOWED_HOSTS_ENV_STRING=localhost
+      - ALLOWED_HOSTS_ENV_STRING=${ALLOWED_HOSTS_ENV_STRING}
     volumes:
       - /home/soosh/builds/django-meetups-rest/:/code/
     #command: /bin/sh -c "./refresh.sh && gunicorn -b 0.0.0.0:62231 mysite.wsgi"
@@ -25,6 +25,8 @@ services:
   db:
     #MYSQL
     image: mysql:8.0.26
+    ports:
+      - 3306:3306
     #hopefully this delays the loading of other containers that need 
     #this server to be using 'depends_on'
     healthcheck: 

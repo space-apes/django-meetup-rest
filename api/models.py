@@ -12,58 +12,72 @@ import datetime
 #dont forget to add this model to admin.py if you want admin app access.
 
 class User(AbstractUser, PermissionsMixin):
-	#wow! avoided circular dependency by specifying model as string. cool. 
+    email=models.EmailField(unique=True, null=False, blank=False, default="defaultemail@test.com")
+    #fields also included inheriting from AbstractUser, PermissionsMixin:
+        #username
+        #first_name=CharField
+        #last_name=CharField
+        #is_staff=BooleanField
+        #is_active=BooleanField
+        #date_joined=DateTimeField
+        #password=CharField
+        #last_login=DateTimeField
+        #is_superuser=BooleanField
+        #groups=ManyToManyField
+        #user_permissions=ManyToManyField
 
-	#if want to override using 'username' as username field. ex email
-	#USERNAME_FIELD = 
-	#for validation
-	#REQUIRED_FIELDS = ['',''...]
-	def __str__(self):
-		return self.username	
+    #if want to override using 'username' as username field. ex email
+    #USERNAME_FIELD =
+
+    #can't set the username_field as a required field
+    REQUIRED_FIELDS = ['email', 'password']
+    
+    def __str__(self):
+        return self.username	
 
 #write a custom User manager in order to include hashed passwords 
 #and more advanced User features
 
 class UserManager(BaseUserManager):
-	def create_user(self, username, first_name, last_name, email, password):
-		user = self.model(
-				username = username,
-				first_name=first_name,
-				last_name=last_name,
-				email=email,
-				last_login=datetime.now()
-				)
-		user.set_password(password)
-		user.save(using=self._db)
+    pass
+    """
+        all many to many fields are empty on creation
+    """
 
 class MeetupGroup(models.Model):
-	name = models.CharField(max_length=25, unique=True)
-	description = models.CharField(max_length=100, default='default description')
-	create_date = models.DateField('date created')
-	members = models.ManyToManyField(User, related_name='meetup_groups')
-	admin = models.ForeignKey(User, null = True, related_name="admin_user", on_delete=models.CASCADE)
-		
+    name = models.CharField(max_length=25, unique=True)
+    description = models.CharField(max_length=100, default='default description')
+    create_date = models.DateField('date created')
+    #wow! can avoid circular dependency by specifying associated model class as string. cool. 
+    members = models.ManyToManyField('User', related_name='meetup_groups')
+    admin = models.ForeignKey(User, null = False, default=1, related_name="admin_user", on_delete=models.CASCADE)
 
-	def __str__(self):
-		return self.name
+    REQUIRED_FIELDS=['name', 'description','admin']
+    
+    def __str__(self):
+            return self.name
 
 class Tag(models.Model):
-	name = models.CharField(max_length=25)
-	create_date = models.DateField('date_created')
-	meetup_groups = models.ManyToManyField(MeetupGroup, related_name='tags')
+    name = models.CharField(max_length=25)
+    create_date = models.DateField('date_created')
+    meetup_groups = models.ManyToManyField(MeetupGroup, related_name='tags')
 
-	def __str__(self):
-		return self.name
+    REQUIRED_FIELDS=['name']
+
+    def __str__(self):
+            return self.name
 
 class Event(models.Model):
-	name = models.CharField(max_length=50)
-	description = models.CharField(max_length=200)
-	date = models.DateTimeField('date of event')
-	address = models.CharField(max_length = 100)
-	date_created = models.DateField('date created')
-	host = models.ForeignKey(User, related_name='host_user', on_delete=models.CASCADE)
-	meetup_group = models.ForeignKey(MeetupGroup, on_delete=models.CASCADE)
-	participants = models.ManyToManyField(User, related_name='events')
-	
-	def __str__(self):
-		return self.name
+    name = models.CharField(max_length=50)
+    description = models.CharField(max_length=200)
+    date = models.DateTimeField('date of event')
+    address = models.CharField(max_length = 100)
+    date_created = models.DateField('date created')
+    host = models.ForeignKey(User, null=False, default=1, related_name='host_user', on_delete=models.CASCADE)
+    meetup_group = models.ForeignKey(MeetupGroup, null=False, default=1, on_delete=models.CASCADE)
+    participants = models.ManyToManyField(User, related_name='events')
+
+    REQUIRED_FIELDS=['name','description', 'address', 'host', 'meetup_group']
+    
+    def __str__(self):
+            return self.name

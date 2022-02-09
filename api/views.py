@@ -1,28 +1,29 @@
 from api.models import User, MeetupGroup, Event, Tag
-from .serializers import UserSerializer, MeetupGroupSerializer, TagSerializer, EventSerializer
 from rest_framework import viewsets, permissions, mixins, generics, filters, exceptions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
 import re
 from api.exceptions import BadSearchQueryParameterException
+from .serializers import (
+    UserSerializer, 
+    MeetupGroupSerializer, 
+    TagSerializer, 
+    EventSerializer
+)
 from api.permissions import (
-                    IsSuperUser,
-                    IsAnonymousUser,
-                    IsAuthenticatedUser,
-                    IsTargetedUser,
-                    IsRequestingGet,
-                    IsRequestingPost,
-                    IsTheMeetupGroupAdmin,
-                    IsTheEventHost,
-                    IsMemberOfMeetupGroupAssociatedWithEvent,
-
-
-
-
-		)
+    IsSuperUser,
+    IsAnonymousUser,
+    IsAuthenticatedUser,
+    IsTargetedUser,
+    IsRequestingGet,
+    IsRequestingPost,
+    IsTheMeetupGroupAdmin,
+    IsTheEventHost,
+    IsMemberOfMeetupGroupAssociatedWithEvent,
+)
 
 #retrieve request query parameters like so: 
 	#self.request.query_params.get('make')
@@ -41,10 +42,17 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows Users to be CRUD'd
     """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsSuperUser|IsTargetedUser|(IsAnonymousUser&IsRequestingPost)]
 
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return User.objects.all()
+        elif self.request.user.is_authenticated:
+            return User.objects.filter(id=self.request.user.id)
+        else:
+            return User.objects.none()
 
 class MeetupGroupViewSet(viewsets.ModelViewSet):
     """
@@ -82,6 +90,16 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
                                        .distinct()	
                     
                     return meetups_matching
+
+    #anytime a meetup group is created, it should set user that is creating 
+    #as the meetup group as the admin for that meetup group
+    #1. take in data
+    #2. validate data
+    #3. create model instance from data (deserialize) 
+    #4. attach user as admin
+    #5. persist model instance
+    #6. return serialized instance from api?
+
                     
 class TagViewSet(viewsets.ModelViewSet):
     """
