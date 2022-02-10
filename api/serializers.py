@@ -5,8 +5,7 @@ from rest_framework import serializers
 #in serializers too. the 'related_name' field is really important here
 
 
-#TODO: validators on serializers!!!
-#TODO: distinct serializers/valdation for different http methods!
+#TODO: deal with creating meetup groups with multiple tags associated
 
 """
     custom field validators like this:
@@ -54,15 +53,15 @@ class MeetupGroupSerializer(serializers.HyperlinkedModelSerializer):
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     admin = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
     tags = serializers.PrimaryKeyRelatedField(many = True, read_only=True)
+    
     class Meta:
         model = MeetupGroup
         #do i need to include host_id if i am adding a relationship through serializers?
         #NO these are model fields not DB record fields. you are still in python land!
         fields = ['url', 'name', 'create_date', 'description', 'members', 'admin', 'tags']
 
-    #override create method to force user who created group to be admin
 
-    #TODO: deal with creating meetup groups with multiple tags associated
+    #override create method to force user who created group to be admin
     def create(self, validated_data):
         meetup_group = MeetupGroup(**validated_data)
         meetup_group.admin = self.context['request'].user
@@ -76,3 +75,6 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
             model = Event
             fields = ['name', 'description', 'date', 'address', 'date_created', 'host', 'meetup_group', 'participants']
+
+    #TODO: event serializer create forces meetup group field and host field
+

@@ -14,8 +14,8 @@ router.register(r'events', EventViewSet)
 # TODO: make url endpoints unique strings for meetup groups because its fun.
 # TODO: use nested routers to consolidate urlpattern paths
 
-#users_router = routers.NestedSimpleRouter(router, 'users')
-#users_router.register('meetup_groups', UserMeetupGroupViewSet, 'user_meetup_group')
+#users_router = routers.NestedDefaultRouter(router, r'users')
+#users_router.register('meetup_groups', MeetupGroupViewSet, basename='meetup_group')
 
 urlpatterns = [
 	path('', index, name='index'),
@@ -24,6 +24,7 @@ urlpatterns = [
 	path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
 	path('api/', include(router.urls)),
+        #path('api/', include(users_router.urls)),
         #path('api/users/<int:user_pk>/', UserViewSet.as_view({'get':'me'}), name='me')
 	#path('api/users/<int:user_pk>/meetup_groups/', UserMeetupGroupViewSet.as_view({'get':'list'})),
 	#path('api/users/<int:user_pk>/meetup_groups/<int:meetup_group_pk>/', UserMeetupGroupViewSet.as_view({'get':'retrieve'})),

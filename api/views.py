@@ -25,6 +25,27 @@ from api.permissions import (
     IsMemberOfMeetupGroupAssociatedWithEvent,
 )
 
+"""
+the create flow is: 
+   viewset.create()->
+        get_serializer(data=request.data)
+        serializer.is_valid
+        viewset.perform_create->
+            serializer.save()->
+                serializer.create()(orupdate) 
+        return Response(serializer.data, status code)
+
+- for the most part, leave the viewset's create function alone.
+    - it validates request data
+    - it calls perform_create   
+    - it returns a response with header
+
+
+-perform_create can be used for adding data before serializer.save()
+
+"""
+
+
 #retrieve request query parameters like so: 
 	#self.request.query_params.get('make')
 #access slug values from urlconfs with 
