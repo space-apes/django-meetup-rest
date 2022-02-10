@@ -5,12 +5,12 @@ from api.models import *
 
 class IsSuperUser(permissions.BasePermission):
     def has_permission(self, request, view):
-        print(f"permissions::IsSuperuser VIEW? {request.user.is_superuser}")
+        print(f"permissions::IsSuperuser view? {request.user.is_superuser}")
         return request.user.is_superuser
 
 class IsAnonymousUser(permissions.BasePermission):
     def has_permission(self, request, view):
-        print(f"permissions::isAnonymous user VIEW? {request.user.is_anonymous}")
+        print(f"permissions::isAnonymous user view? {request.user.is_anonymous}")
         return request.user.is_anonymous
 
 class IsAuthenticatedUser(permissions.BasePermission):
@@ -23,7 +23,6 @@ class IsTargetedUser(permissions.BasePermission):
     def has_permission(self, request, view):
         if not request.user.is_authenticated or not 'pk' in view.kwargs.keys():
             return False
-        
         return request.user.id == int(view.kwargs['pk'])
 
 class IsRequestingGet(permissions.BasePermission):
@@ -41,16 +40,16 @@ class IsRequestingPost(permissions.BasePermission):
 
 class IsTheMeetupGroupAdmin(permissions.BasePermission):
     message="attempting to modify meetup group you are not admin of"
-    def has_permission(self, request, view):
-            print(f"permissions: isTheMeetupGroupAdmin VIEW? False")
-            return True
-
-    def has_object_permission(self, request, view, obj):
-        if not isinstance(obj, MeetupGroup):
-            print(f"permissions: isMeetupGroupAdmin OBJ? not an instance of MeetupGroup!")
-            return False
-        print(f"permissions: isTheMeetupGroupAdmin obj? {request.user == obj.admin}")
-        return request.user == obj.admin
+    
+    """
+    def has_permission(self,request,view):
+        perm = False
+        print(f"permissions:IsTheMeetupGroupAdmin view = {perm}")
+        return perm
+    """
+    def has_object_permission(self,request,view,obj):
+        print(f"permissions:IsTheMeetupGroupAdmin object = {self.request.user == obj.admin}")
+        return self.request.user == obj.admin
 
 class IsTheEventHost(permissions.BasePermission):
     message="attempting to modify event you are not host of"

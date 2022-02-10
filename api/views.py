@@ -45,6 +45,7 @@ the create flow is:
 
 """
 
+#TODO: special actions for events and meetup groups: join leave
 
 #retrieve request query parameters like so: 
 	#self.request.query_params.get('make')
@@ -111,17 +112,39 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
                                        .distinct()	
                     
                     return meetups_matching
+    """
+    def retrieve(self, request, *args, **kwargs):
+        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+        self.check_object_permission(self.request, obj)
+        print(f"views::MeetupGroupViewset::retrieve being called")
+        serializer = self.get_serializer(obj)
+        return Response(serializer.data)
 
-    #anytime a meetup group is created, it should set user that is creating 
-    #as the meetup group as the admin for that meetup group
-    #1. take in data
-    #2. validate data
-    #3. create model instance from data (deserialize) 
-    #4. attach user as admin
-    #5. persist model instance
-    #6. return serialized instance from api?
+    """
+    """
+    def get_object(self):
+        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+        self.check_object_permissions(self.request, obj)
+        print(f"views::MeetupGroupViewset::get_object being called")
+        return obj
+    """
 
-                    
+
+class UserMeetupGroupViewSet(viewsets.ModelViewSet):
+    """
+        viewset for alternative access to MeetupGroups, filtered by user.
+        Targeted user from url may be member of group or admin of group or both
+    """
+    serializer_class = MeetupGroupSerializer
+    permission_classes = [IsRequestingGet|IsSuperUser|IsTheMeetupGroupAdmin]
+
+    def get_queryset(self):
+        # 'user_pk' slug variable generated from nested routers
+        targetUser = get_object_or_404(User, pk=self.kwargs['user_pk'])
+        targetUserMeetupGroupIDs = targetUser.meetup_groups.all().values_list('id')
+        return MeetupGroup.objects.filter( Q(admin=targetUser) | Q(id__in=targetUserMeetupGroupIDs))
+    
+
 class TagViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows tags to be CRUD'd
@@ -138,31 +161,17 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsSuperUser|IsTheEventHost|(IsMemberOfMeetupGroupAssociatedWithEvent&IsRequestingGet)]
     queryset = Event.objects.all()
 
-class UserMeetupGroupViewSet(viewsets.ModelViewSet):
+
+class UserEventViewSet(viewsets.ModelViewSet):
     """
-    Alternative API endpoint to meetupgroups 
-    that allows meetup groups associated with a user to be only viewed. 
-    Filtered by meetup groups that user is a 'member' of 
+        viewset for alternative access to Events, filtered by user.
+        Targeted user from url may be member of group or admin of group or both
     """
     serializer_class = MeetupGroupSerializer
-    permission_classes = [IsRequestingGet|IsSuperUser|IsTheMeetupGroupAdmin|(IsAuthenticatedUser&IsRequestingPost)]
-    #permission_classes = [IsSuperUserOrReadOnly]
-    
-    def get_queryset(self, **kwargs):
-            """
-            all views in this class should 
-            reference only meetupgroups that are associated with the current user
-            """
-            user = self.request.user
-            #user = get_object_or_404(User, id=self.kwargs.get('user_pk'))
-            #meetup_queryset = user.meetup_groups.all()
-            meetup_queryset = get_list_or_404(MeetupGroup, admin=user)
-            if meetup_queryset:
-                    print("HOORAY I FOUND A FILTERED QUERYSET!")
-            """
-            if meetup_queryset:
-                    return meetup_queryset
-            else:
-                    raise Http404("this user is not associated with any groups")
-            """
+    permission_classes = [IsSuperUser|IsTheEventHost]
 
+    def get_queryset(self):
+        # 'user_pk' slug variable generated from nested routers
+        targetUser = get_object_or_404(User, pk=self.kwargs['user_pk'])
+        targetUserMeetupGroupIDs = targetUser.meetup_groups.all().values_list('id')
+        return MeetupGroup.objects.filter( Q(admin=targetUser) | Q(id__in=targetUserMeetupGroupIDs))

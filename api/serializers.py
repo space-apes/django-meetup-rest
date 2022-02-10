@@ -23,7 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
     events = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
             model = User
-            fields = ['url', 'username', 'email', 'meetup_groups', 'events', 'first_name', 'last_name', 'password']
+            fields = ['username', 'email', 'meetup_groups', 'events', 'first_name', 'last_name', 'password']
             #ensure password is changeable but not observable
             extra_kwargs = {
                 'password': {'write_only': True}
@@ -44,12 +44,12 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
         return user
         
-class TagSerializer(serializers.HyperlinkedModelSerializer):
+class TagSerializer(serializers.ModelSerializer):
     class Meta:
             model = Tag
             fields = ['name', 'create_date']
 
-class MeetupGroupSerializer(serializers.HyperlinkedModelSerializer):
+class MeetupGroupSerializer(serializers.ModelSerializer):
     members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     admin = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
     tags = serializers.PrimaryKeyRelatedField(many = True, read_only=True)
@@ -58,7 +58,7 @@ class MeetupGroupSerializer(serializers.HyperlinkedModelSerializer):
         model = MeetupGroup
         #do i need to include host_id if i am adding a relationship through serializers?
         #NO these are model fields not DB record fields. you are still in python land!
-        fields = ['url', 'name', 'create_date', 'description', 'members', 'admin', 'tags']
+        fields = ['name', 'create_date', 'description', 'members', 'admin', 'tags']
 
 
     #override create method to force user who created group to be admin
@@ -68,7 +68,7 @@ class MeetupGroupSerializer(serializers.HyperlinkedModelSerializer):
         meetup_group.save()
         return meetup_group
 
-class EventSerializer(serializers.HyperlinkedModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     meetup_group= serializers.PrimaryKeyRelatedField(many=False, read_only=True)
     host = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
     participants = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
