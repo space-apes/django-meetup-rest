@@ -26,7 +26,6 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS_ENV_STRING').split(',')
 # Application definition
 
 INSTALLED_APPS = [
-    #'django.contrib.auth',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -109,6 +108,7 @@ REST_FRAMEWORK = {
 			'rest_framework_simplejwt.authentication.JWTAuthentication',
 			)
 }
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 

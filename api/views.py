@@ -86,6 +86,8 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
 
     serializer_class = MeetupGroupSerializer
     permission_classes = [IsRequestingGet|IsSuperUser|IsTheMeetupGroupAdmin|(IsAuthenticatedUser&IsRequestingPost)]
+    #permission_classes = [IsTheMeetupGroupAdmin | IsSuperUser]
+    #permission_classes = [IsTheMeetupGroupAdmin]
     queryset = MeetupGroup.objects.all()
 
     def get_queryset(self):
@@ -112,15 +114,16 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
                                        .distinct()	
                     
                     return meetups_matching
+   
     """
     def retrieve(self, request, *args, **kwargs):
         obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
-        self.check_object_permission(self.request, obj)
+        self.check_object_permissions(self.request, obj)
         print(f"views::MeetupGroupViewset::retrieve being called")
         serializer = self.get_serializer(obj)
         return Response(serializer.data)
-
     """
+    
     """
     def get_object(self):
         obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])

@@ -8,34 +8,63 @@ class IsSuperUser(permissions.BasePermission):
         print(f"permissions::IsSuperuser view? {request.user.is_superuser}")
         return request.user.is_superuser
 
+    def has_object_permission(self, request, view, obj):
+        print(f"permissions::IsSuperuser obj? {request.user.is_superuser}")
+        return request.user.is_superuser
+
 class IsAnonymousUser(permissions.BasePermission):
     def has_permission(self, request, view):
         print(f"permissions::isAnonymous user view? {request.user.is_anonymous}")
+        return request.user.is_anonymous
+
+    def has_object_permission(self, request, view, obj):
+        print(f"permissions::isAnonymous user obj? {request.user.is_anonymous}")
         return request.user.is_anonymous
 
 class IsAuthenticatedUser(permissions.BasePermission):
     def has_permission(self, request, view):
         print(f"permissions::isAuthenticated user VIEW? {request.user.is_authenticated}")
         return request.user.is_authenticated
+    
+    def has_object_permission(self, request, view, obj):
+        print(f"permissions::isAuthenticated user obj? {request.user.is_authenticated}")
+        return request.user.is_authenticated
+
 
 class IsTargetedUser(permissions.BasePermission):
     message="attempting to access user resource that does not belong to you"
+
+    """
     def has_permission(self, request, view):
+        print(f"permissions:: IsTargetUser NEED TO IMPLEMENT ERROR MESSAGE HERE")
         if not request.user.is_authenticated or not 'pk' in view.kwargs.keys():
             return False
         return request.user.id == int(view.kwargs['pk'])
+    """
+    def has_permission(self,request,view):
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        return self.request.user == obj
 
 class IsRequestingGet(permissions.BasePermission):
     message="is not requesting GET"
     def has_permission(self, request, view):
-        print(f"permissions: isRequestingGet? {request.method=='GET'}")
+        print(f"permissions: isRequestingGet view? {request.method=='GET'}")
+        return request.method == 'GET'
+
+    def has_object_permission(self, request, view, obj):
+        print(f"permissions: isRequestingGet obj? {request.method=='GET'}")
         return request.method == 'GET'
 
 class IsRequestingPost(permissions.BasePermission):
     message="is not requesting POST"
     def has_permission(self, request, view):
-        print(f"permissions: isRequestingPost? {request.method=='POST'}")
+        print(f"permissions: isRequestingPost view? {request.method=='POST'}")
+        return request.method == 'POST'
 
+    def has_object_permission(self, request, view, obj):
+        print(f"permissions: isRequestingPost obj? {request.method=='POST'}")
         return request.method == 'POST'
 
 class IsTheMeetupGroupAdmin(permissions.BasePermission):
@@ -43,13 +72,13 @@ class IsTheMeetupGroupAdmin(permissions.BasePermission):
     
     """
     def has_permission(self,request,view):
-        perm = False
+        perm = True
         print(f"permissions:IsTheMeetupGroupAdmin view = {perm}")
         return perm
     """
     def has_object_permission(self,request,view,obj):
-        print(f"permissions:IsTheMeetupGroupAdmin object = {self.request.user == obj.admin}")
-        return self.request.user == obj.admin
+        print(f"permissions:IsTheMeetupGroupAdmin object = {request.user == obj.admin}")
+        return request.user == obj.admin
 
 class IsTheEventHost(permissions.BasePermission):
     message="attempting to modify event you are not host of"
