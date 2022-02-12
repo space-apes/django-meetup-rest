@@ -18,8 +18,6 @@ from api.permissions import (
     IsAnonymousUser,
     IsAuthenticatedUser,
     IsTargetedUser,
-    IsRequestingGet,
-    IsRequestingPost,
     IsTheMeetupGroupAdmin,
     IsTheEventHost,
     IsMemberOfMeetupGroupAssociatedWithEvent,
@@ -66,15 +64,28 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsSuperUser|IsTargetedUser|(IsAnonymousUser&IsRequestingPost)]
-
-    def get_queryset(self):
-        if self.request.user.is_superuser:
-            return User.objects.all()
-        elif self.request.user.is_authenticated:
-            return User.objects.filter(id=self.request.user.id)
+    #permission_classes = [IsSuperUser|IsTargetedUser|(IsAnonymousUser&IsRequestingPost)]
+    #permission_classes = []
+    
+#    def get_queryset(self):
+#        if self.request.user.is_superuser:
+#            return User.objects.all()
+#        elif self.request.user.is_authenticated:
+#            return User.objects.filter(id=self.request.user.id)
+#        else:
+#            return User.objects.none()
+#
+    def get_permissions(self):
+        #print(f"views::UserViewSet::get_permissions is being called")
+        if self.action == 'list':
+            self.permission_classes = [IsSuperUser]
+        elif self.action in ['retrieve','update', 'partial_update', 'destroy']:
+            self.permission_classes= [IsSuperUser|IsTargetedUser]
+        elif self.action == 'create':
+            self.permission_classes = [IsSuperUser|IsAnonymousUser]
         else:
-            return User.objects.none()
+            self.permission_classes = []
+        return super(UserViewSet, self).get_permissions()
 
 class MeetupGroupViewSet(viewsets.ModelViewSet):
     """
@@ -85,10 +96,24 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = MeetupGroupSerializer
-    permission_classes = [IsRequestingGet|IsSuperUser|IsTheMeetupGroupAdmin|(IsAuthenticatedUser&IsRequestingPost)]
-    #permission_classes = [IsTheMeetupGroupAdmin | IsSuperUser]
-    #permission_classes = [IsTheMeetupGroupAdmin]
+    #permission_classes = [IsSuperUser|IsTheMeetupGroupAdmin|(IsAuthenticatedUser&IsRequestingPost)]
     queryset = MeetupGroup.objects.all()
+
+    def get_permissions(self):
+        #print(f"views::MeetupViewSet::get_permissions is being called")
+        if self.action in ['list', 'retrieve']:
+            self.permission_classes = [permissions.AllowAny]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            self.permission_classes= [IsSuperUser|IsTheMeetupGroupAdmin]
+        elif self.action == 'create':
+            self.permission_classes = [IsSuperUser|IsAuthenticatedUser]
+        elif self.action =='join':
+            self.permission_classes = [IsAuthenticatedUser]
+        elif self.action =='leave':
+            self.permission_classes = [IsMemberOfTheMeetupGroup]
+        else:
+            self.permission_classes = []
+        return super(MeetupGroupViewSet, self).get_permissions()
 
     def get_queryset(self):
             """
@@ -115,23 +140,6 @@ class MeetupGroupViewSet(viewsets.ModelViewSet):
                     
                     return meetups_matching
    
-    """
-    def retrieve(self, request, *args, **kwargs):
-        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
-        self.check_object_permissions(self.request, obj)
-        print(f"views::MeetupGroupViewset::retrieve being called")
-        serializer = self.get_serializer(obj)
-        return Response(serializer.data)
-    """
-    
-    """
-    def get_object(self):
-        obj = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
-        self.check_object_permissions(self.request, obj)
-        print(f"views::MeetupGroupViewset::get_object being called")
-        return obj
-    """
-
 
 class UserMeetupGroupViewSet(viewsets.ModelViewSet):
     """
@@ -139,7 +147,7 @@ class UserMeetupGroupViewSet(viewsets.ModelViewSet):
         Targeted user from url may be member of group or admin of group or both
     """
     serializer_class = MeetupGroupSerializer
-    permission_classes = [IsRequestingGet|IsSuperUser|IsTheMeetupGroupAdmin]
+    permission_classes = [IsSuperUser|IsTheMeetupGroupAdmin]
 
     def get_queryset(self):
         # 'user_pk' slug variable generated from nested routers
@@ -161,7 +169,7 @@ class EventViewSet(viewsets.ModelViewSet):
     API endpoint that allows events to be CRUD'd
     """
     serializer_class = EventSerializer
-    permission_classes = [IsSuperUser|IsTheEventHost|(IsMemberOfMeetupGroupAssociatedWithEvent&IsRequestingGet)]
+    permission_classes = [IsSuperUser]
     queryset = Event.objects.all()
 
 
@@ -170,11 +178,27 @@ class UserEventViewSet(viewsets.ModelViewSet):
         viewset for alternative access to Events, filtered by user.
         Targeted user from url may be member of group or admin of group or both
     """
-    serializer_class = MeetupGroupSerializer
+    serializer_class = EventSerializer
     permission_classes = [IsSuperUser|IsTheEventHost]
+
+    def get_permissions(self):
+        #print(f"views::UserEventViewSet::get_permissions is being called")
+        if self.action in ['list', 'retrieve']:
+            self.permission_classes = [IsSuperUser|IsTheEventHost|IsMemberOfMeetupGroupAssociatedWithEvent]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            self.permission_classes= [IsSuperUser|IsTheMeetupGroupAdmin]
+        elif self.action == 'create':
+            self.permission_classes = [IsSuperUser|IsAuthenticatedUser]
+        elif self.action =='join':
+            self.permission_classes = [IsAuthenticatedUser]
+        elif self.action =='leave':
+            self.permission_classes = [IsMemberOfTheMeetupGroup]
+        else:
+            self.permission_classes = []
+        return super(UserEventViewSet, self).get_permissions()
 
     def get_queryset(self):
         # 'user_pk' slug variable generated from nested routers
         targetUser = get_object_or_404(User, pk=self.kwargs['user_pk'])
-        targetUserMeetupGroupIDs = targetUser.meetup_groups.all().values_list('id')
-        return MeetupGroup.objects.filter( Q(admin=targetUser) | Q(id__in=targetUserMeetupGroupIDs))
+        targetUserEventIDs = targetUser.events.all().values_list('id')
+        return MeetupGroup.objects.filter( Q(host=targetUser) | Q(id__in=targetUserEventIDs))
