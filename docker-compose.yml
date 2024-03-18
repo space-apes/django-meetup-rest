@@ -41,7 +41,7 @@ services:
     expose:
       - 3306
     environment:
-      - MYSQL_ROOT_PASSWORD=t4nz4n14
+      - MYSQL_ROOT_PASSWORD= NOT GOING TO GIVE IT 
     networks:
       - meetup_network
 
