@@ -1,4 +1,4 @@
-# REST API for social meetup type web application
+# Dockerized Python/Django REST API for social meetup type web application
 
 # features 
 - uses djangorestframework for REST API
